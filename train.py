@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     model.eval()
     _, pred = model(data).max(dim=1)
-    print(pred[0])
+
     correct = int(pred[data.train_mask].eq(data.y[data.train_mask]).sum().item())
     acc = correct / int(data.train_mask.sum())
     print('GCN Accuracy on train set: {:.4f}'.format(acc))
