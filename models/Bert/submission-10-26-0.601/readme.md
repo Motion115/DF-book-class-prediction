@@ -11,4 +11,4 @@
 3. 数据集手动删除无用的token
 
 ## 复现方式
-1. best_model.pth为在验证集上的最佳模型，run predict.py即可在测试集上预测label
+1. best_model.pth为在验证集上的最佳模型，run predict.py即可在测试集上预测label (模型文件太大了，无法上传/(ㄒoㄒ)/~~）
