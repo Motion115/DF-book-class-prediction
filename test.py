@@ -9,27 +9,42 @@ from models.GCN import GCN
 import numpy as np
 from copy import deepcopy
 import pandas as pd
+from utils import load_data
 
 if __name__ == "__main__":
     root = "./data"
-    weights_directory = "./weights/" + "20231026-164707"
+    weights_directory = "./weights/" + "20231027-144230"
 
-    data_path = os.path.join(root, 'Children.csv')
-    # data_preprocessor = DataPreprocessor(data_path, SequenceEncoder())
-    data_preprocessor = DataPreprocessor(data_path, load_feature_from_disk="./data/node_attr.pt")
-
+    data_preprocessor, model = load_data("./data/bert-cls-embeddings.pth", GCN)
     data = data_preprocessor.graph
 
-    num_node_features=data.x.shape[1]
-    model= GCN(num_node_features, num_classes=24)
+    best_train_acc = 0
+    best_weight_file = ""
 
-    # load checkpoint
-    checkpoint = torch.load(os.path.join(weights_directory, "990_model.pt"))
+    # list directories in the weights_directory
+    weight_files = os.listdir(weights_directory)
+    for weight_file in tqdm(weight_files):
+        # load checkpoint
+        checkpoint = torch.load(os.path.join(weights_directory, weight_file))
+        # load best model parameter
+        model.load_state_dict(checkpoint)
+
+        model.eval()
+        _, pred = model(data).max(dim=1)
+
+        correct = int(pred[data.train_mask].eq(data.y[data.train_mask]).sum().item())
+        acc = correct / int(data.train_mask.sum())
+
+        if acc > best_train_acc:
+            print()
+            print(weight_file, '{:.4f}'.format(acc))
+            best_weight_file = weight_file
+            best_train_acc = acc
+
+    # load theoretical best
+    checkpoint = torch.load(os.path.join(weights_directory, best_weight_file))
     # load best model parameter
     model.load_state_dict(checkpoint)
-
-    model.eval()
-    _, pred = model(data).max(dim=1)
  
     test_nodes = data_preprocessor.raw_data_source["node_id"][np.array(data.test_mask)].to_list()
     prediction_results = pred[data.test_mask]

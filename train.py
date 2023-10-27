@@ -1,33 +1,26 @@
 import os
-from dataloader import DataPreprocessor
 import torch
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from models.GCN import GCN
-
 import time
+from models.GCN import GCN
+from utils import load_data
+
 if __name__ == '__main__':
-    root = "./data"
     # get current time
     current_time = time.strftime("%Y%m%d-%H%M%S")
     weights_directory = "./weights/" + current_time
     # create weights directory
     if not os.path.exists(weights_directory):
         os.makedirs(weights_directory)
-    data_path = os.path.join(root, 'Children.csv')
-    # data_preprocessor = DataPreprocessor(data_path, SequenceEncoder())
-    data_preprocessor = DataPreprocessor(data_path, load_feature_from_disk="./data/node_attr.pt")
 
+    data_preprocessor, model = load_data("./data/bert-cls-embeddings.pth", GCN)
     data = data_preprocessor.graph
-
-    num_node_features=data.x.shape[1]
-    model= GCN(num_node_features, num_classes=24)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     loss_function = torch.nn.CrossEntropyLoss()
-
     # judge if cuda is present
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # model and data to device

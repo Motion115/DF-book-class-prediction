@@ -14,6 +14,8 @@ class DataPreprocessor():
         COO_mat = self.build_COO_matrix(src_col='node_id', dst_col='neighbour')
         if load_feature_from_disk is not None:
             node_attributes = torch.load(load_feature_from_disk)
+            # transform node_attributes into a torch tensor
+            node_attributes = torch.tensor(node_attributes, dtype=torch.float)
             # print(node_attributes.shape)
         else:
             node_attributes = self.build_node_attribute(attr_col="text", feat_eng_method=feat_eng_method)
