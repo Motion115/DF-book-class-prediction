@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from models.GCN import GCN
+from models.NN import MLP
 import numpy as np
 from copy import deepcopy
 import pandas as pd
@@ -13,14 +13,14 @@ from utils import load_data
 
 if __name__ == "__main__":
     root = "./data"
-    weights_directory = "./weights/" + "20231112-200612"
+    weights_directory = "./weights/" + "20231112-202804"
 
-    data_preprocessor, model = load_data("./data/bert-cls-embeddings.pth", GCN)
+    data_preprocessor, model = load_data("./data/bert-cls-embeddings.pth", MLP)
     data = data_preprocessor.graph
 
     best_train_acc = 0
     # 602
-    best_weight_file = "70_model.pt"
+    best_weight_file = "104_model.pt"
     # model.eval()
     # _, pred = model(data).max(dim=1)
     # correct = int(pred[data.train_mask].eq(data.y[data.train_mask]).sum().item())
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     model.load_state_dict(checkpoint)
 
     model.eval()
-    _, pred = model(data).max(dim=1)
+    _, pred = model(data.x).max(dim=1)
 
     correct = int(pred[data.train_mask].eq(data.y[data.train_mask]).sum().item())
     acc = correct / int(data.train_mask.sum())

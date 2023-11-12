@@ -5,7 +5,7 @@ from torch_geometric.nn import GCNConv
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 import time
-from models.GCN import GCN
+from models.NN import MLP
 from utils import load_data
 
 if __name__ == '__main__':
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     data_preprocessor, model = load_data(
         embedding_filename="./data/bert-cls-embeddings.pth",
-        model_class=GCN,
+        model_class=MLP,
         sampling_strategy="downsample",
     )
     data = data_preprocessor.graph
@@ -42,14 +42,14 @@ if __name__ == '__main__':
     with tqdm(total=num_epochs) as t:
         for epoch in range(num_epochs):
 
-            out = model(data)
+            out = model(data.x)
             optimizer.zero_grad()
             loss = loss_function(out[data.train_mask], data.y[data.train_mask])
             loss.backward()
             optimizer.step()
 
             model.eval()
-            _, pred = model(data).max(dim=1)
+            _, pred = model(data.x).max(dim=1)
             correct = int(pred[data.val_mask].eq(data.y[data.val_mask]).sum().item())
             acc = correct / int(data.val_mask.sum())
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         
 
     model.eval()
-    _, pred = model(data).max(dim=1)
+    _, pred = model(data.x).max(dim=1)
 
     correct = int(pred[data.train_mask].eq(data.y[data.train_mask]).sum().item())
     acc = correct / int(data.train_mask.sum())
