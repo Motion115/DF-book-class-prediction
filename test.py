@@ -6,6 +6,8 @@ from torch_geometric.nn import GCNConv
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from models.GCN import GCN
+from models.GAT import GAT
+from models.Gsage import GraphSAGE
 import numpy as np
 from copy import deepcopy
 import pandas as pd
@@ -13,14 +15,14 @@ from utils import load_data
 
 if __name__ == "__main__":
     root = "./data"
-    weights_directory = "./weights/" + "20231112-200612"
+    weights_directory = "./weights/" + "20231114-114200"
 
-    data_preprocessor, model = load_data("./data/bert-cls-embeddings.pth", GCN)
+    data_preprocessor, model = load_data("./data/bert-cls-embeddings.pth", GraphSAGE)
     data = data_preprocessor.graph
 
     best_train_acc = 0
     # 602
-    best_weight_file = "70_model.pt"
+    best_weight_file = "143_model.pt"
     # model.eval()
     # _, pred = model(data).max(dim=1)
     # correct = int(pred[data.train_mask].eq(data.y[data.train_mask]).sum().item())
@@ -76,3 +78,14 @@ if __name__ == "__main__":
     result_df = pd.DataFrame(result_list)
     # to csv, without index
     result_df.to_csv("./submission.csv", index=False)
+
+    # test provisional accuracy
+    voted_truth = pd.read_csv("./voted_gt/ground_truth.csv")
+    # inner join result_df and voted_truth
+    voted_result = result_df.merge(voted_truth, on="node_id", how="inner")
+
+    # count the percentage of agreement on "voted_gt" and "label"
+    voted_result["agreement"] = voted_result.apply(lambda x: 1 if x["label"] == x["voted_gt"] else 0, axis=1)
+    # add up the "agreement" column
+    sum = voted_result["agreement"].sum()
+    print("Provisional test accuracy:", sum / len(voted_result))

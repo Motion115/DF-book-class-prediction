@@ -6,6 +6,8 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 import time
 from models.GCN import GCN
+from models.GAT import GAT
+from models.Gsage import GraphSAGE
 from utils import load_data
 
 if __name__ == '__main__':
@@ -18,8 +20,8 @@ if __name__ == '__main__':
 
     data_preprocessor, model = load_data(
         embedding_filename="./data/bert-cls-embeddings.pth",
-        model_class=GCN,
-        sampling_strategy="downsample",
+        model_class=GraphSAGE,
+        sampling_strategy=None#"downsample",
     )
     data = data_preprocessor.graph
 

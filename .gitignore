@@ -2,6 +2,7 @@ data
 runs
 weights
 submission.csv
+voted_gt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
