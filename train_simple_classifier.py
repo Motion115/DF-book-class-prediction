@@ -17,7 +17,7 @@ if __name__ == '__main__':
         os.makedirs(weights_directory)
 
     data_preprocessor, model = load_data(
-        embedding_filename="./data/bert-cls-embeddings.pth",
+        embedding_filename="./data/fuse-embeddings.pth",
         model_class=MLP,
         sampling_strategy="downsample",
     )

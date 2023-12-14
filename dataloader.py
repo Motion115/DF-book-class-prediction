@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import torch
 import numpy as np
-from encoding.sentence_transformer import SentenceTransformer
+# from encoding.sentence_transformer import SentenceTransformer
 from torch_geometric.data import Data
 from sampling.strategies import SamplingStrategies
 

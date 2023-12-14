@@ -1,6 +1,7 @@
 data
 runs
 weights
+fuse_weight
 submission.csv
 voted_gt
 
